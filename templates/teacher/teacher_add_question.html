@@ -17,8 +17,9 @@
     
   </style>
 </head>
+
 <h2 style="text-align:center; color:blue;">ADD QUESTION</h2>
-<form method="POST" autocomplete="off" style="margin:100px;margin-top: 0px;">
+<form method="POST" autocomplete="off" style="margin:100px;margin-top: 0px;" enctype="multipart/form-data" >
     {%csrf_token%}
     <div class="form-group">
         <label for="question">Course</label>
@@ -28,20 +29,65 @@
       <label for="question">Question</label>
       {% render_field questionForm.question|attr:'required:true' class="form-control" placeholder="What is the currency of India ?" %}
         <br>
+
+        <label for="question">Add Image</label>
+      {{ questionForm.image }}
+        <br>
       <label for="question_number">Marks</label>
       {% render_field questionForm.marks|attr:'required:true' class="form-control" placeholder="10" %}
         <br>
-      <label for="option1">Option 1</label>
-      {% render_field questionForm.option1|attr:'required:true' class="form-control" placeholder="Rupees" %}
+
+
+
+    <div id="form_set_options1">
+
+        
+        {{ formset.management_form }}
+        {% for form in formset %}
+                    {{ form.name.errors }}
+                      {{ form.name }}
+            {% endfor %}
+
+        
+        <div id="empty_form_options1" style="display:none">
+          <hr>
+          <div >
+        
+              {% for form in formset %}
+              {% for hidden in form.hidden_fields %}
+              {{ hidden }}
+              {% endfor %}
+              <!-- form.visible fields go here -->
+              {% endfor %}
+              {{ formset.empty_form.non_field_errors }}
+              <div >
+                  {{ formset.empty_form.name.errors }}
+                  {{ formset.empty_form.name }}
+              </div>
+              
+              
+        
+          </div>
+        </div>
+        
+      </div>
+      <div  style="margin-top: 20px;">
+        <button class="btn btn-primary" id="add_more_options1">
+            Add options
+        </button>
+      </div>
+      <!-- <label for="option1" id='option1'>Option 1</label>
+      {% render_field questionForm.options|attr:'required:true' class="form-control" placeholder="Rupees" %}
         <br>
       <label for="option2">Option 2</label>
       {% render_field questionForm.option2|attr:'required:true' class="form-control" placeholder="Dollar" %}
         <br>
-      <label for="option3">Option 3</label>
-      {% render_field questionForm.option3|attr:'required:true' class="form-control" placeholder="Taka" %}
+      <label class="option" for="option3">Option 3</label>
+      {% render_field questionForm.option3|attr:'required:true' class="form-control option" placeholder="Taka" %}
         <br>
-      <label for="option4">Option 4</label>
-      {% render_field questionForm.option4|attr:'required:true' class="form-control" placeholder="Euro" %}
+      <label class="option" for="option4">Option 4</label>
+
+      {% render_field questionForm.option4|attr:'required:true' class="form-control option" placeholder="Euro" %} -->
         <br>
       <label for="answer">Answer</label>
       {% render_field questionForm.answer|attr:'required:true' class="form-control" %}
@@ -51,4 +97,41 @@
     <button type="submit" class="btn btn-primary">ADD</button>
   </form>
 <br><br><br>
+
+
+
+
+<script>
+
+  $(document).ready(function () {
+    $('#add_more_options1').click(function () {
+      
+      var form_idx1 = $('#id_options-TOTAL_FORMS').val();
+      var sVal = '234';
+      
+      var total = parseInt(form_idx1) + 1
+      $("#id_answer").children('option:gt('+form_idx1+')').hide();
+      $("#id_answer").children("option[value^= Option1]").show()
+      console.log('totoal', total);
+      console.log(form_idx1);
+      if (form_idx1 == 3){
+        $("#add_more_options1").attr("disabled", true);
+      }
+      // For debugging the issue
+      //console.log('Element', $('#id_experience-TOTAL_FORMSS'), 'Num of forms', form_idx);
+      
+      $('#form_set_options1').append($('#empty_form_options1').html().replace(/__prefix__/g, form_idx1));
+      
+      $('#id_options-TOTAL_FORMS').val(parseInt(form_idx1) + 1);
+      $("#id_answer").children("option[value^= Option"+total+"]").show()
+      
+      //$('#id_answer').append(`<option value="Option${total}">Option${total}</option>`);
+      
+      console.log('Element', $('#id_options-TOTAL_FORMS'));
+    });
+  });
+
+
+  
+</script>
 {% endblock content %}

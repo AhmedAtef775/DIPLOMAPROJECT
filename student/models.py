@@ -15,3 +15,9 @@ class Student(models.Model):
         return self
     def __str__(self):
         return self.user.first_name
+
+class UserAvailable(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name

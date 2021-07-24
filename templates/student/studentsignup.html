@@ -23,7 +23,9 @@
     {% csrf_token %}
     <div class="form-row">
       <div class="form-group col-md-6">
+        {{ userForm.username.errors }}
         <label for="username">Username</label>
+        <!-- {{ userForm.username }} -->
         {% render_field userForm.username|attr:'required:true'  class="form-control" placeholder="username" %}
       </div>
       <div class="form-group col-md-6">

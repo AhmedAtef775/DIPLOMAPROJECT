@@ -9,7 +9,11 @@ from datetime import date, timedelta
 from quiz import models as QMODEL
 from student import models as SMODEL
 from quiz import forms as QFORM
-
+#Wafi edit's add formset
+from django.forms import formset_factory, modelformset_factory
+from quiz.forms import OptionModelForm
+from quiz.models import Option, Course
+from quiz.forms import QuestionForm
 
 #for showing signup/login button for teacher
 def teacherclick_view(request):
@@ -91,18 +95,29 @@ def teacher_question_view(request):
 @login_required(login_url='teacherlogin')
 @user_passes_test(is_teacher)
 def teacher_add_question_view(request):
-    questionForm=QFORM.QuestionForm()
+    questionForm = QuestionForm(request.POST or None,  request.FILES)
+    optionsFormset = formset_factory(OptionModelForm, extra=1, can_delete=True, max_num=4)
+    formset = optionsFormset(request.POST or None, prefix='options')
     if request.method=='POST':
-        questionForm=QFORM.QuestionForm(request.POST)
-        if questionForm.is_valid():
+        
+        if questionForm.is_valid()  and formset.is_valid():
             question=questionForm.save(commit=False)
-            course=QMODEL.Course.objects.get(id=request.POST.get('courseID'))
+            if 'image' in request.FILES:
+                question.image = request.FILES['image']
+            course = Course.objects.get(id=request.POST.get('courseID'))
             question.course=course
+            question.save()
+            for f in formset:
+                option = f.cleaned_data.get('name')
+                create_option = Option.objects.create(name=option)
+                create_option.save()
+                question.options.add(create_option.id)
             question.save()       
         else:
             print("form is invalid")
         return HttpResponseRedirect('/teacher/teacher-view-question')
-    return render(request,'teacher/teacher_add_question.html',{'questionForm':questionForm})
+        
+    return render(request,'teacher/teacher_add_question.html',{'questionForm':questionForm, 'formset': formset})
 
 @login_required(login_url='teacherlogin')
 @user_passes_test(is_teacher)

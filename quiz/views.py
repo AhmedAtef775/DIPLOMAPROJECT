@@ -13,6 +13,10 @@ from student import models as SMODEL
 from teacher import forms as TFORM
 from student import forms as SFORM
 from django.contrib.auth.models import User
+#Wafi edit's add formset
+from django.forms import formset_factory, modelformset_factory
+from quiz.forms import OptionModelForm
+from quiz.models import Option
 
 
 
@@ -223,18 +227,28 @@ def admin_question_view(request):
 
 @login_required(login_url='adminlogin')
 def admin_add_question_view(request):
-    questionForm=forms.QuestionForm()
+    questionForm=forms.QuestionForm(request.POST or None,  request.FILES)
+    optionsFormset = formset_factory(OptionModelForm, extra=1, can_delete=True, max_num=4)
+    formset = optionsFormset(request.POST or None, prefix='options')
     if request.method=='POST':
-        questionForm=forms.QuestionForm(request.POST)
-        if questionForm.is_valid():
+        
+        if questionForm.is_valid()  and formset.is_valid():
             question=questionForm.save(commit=False)
+            if 'image' in request.FILES:
+                question.image = request.FILES['image']
             course=models.Course.objects.get(id=request.POST.get('courseID'))
             question.course=course
+            question.save()
+            for f in formset:
+                option = f.cleaned_data.get('name')
+                create_option = Option.objects.create(name=option)
+                create_option.save()
+                question.options.add(create_option.id)
             question.save()       
         else:
             print("form is invalid")
         return HttpResponseRedirect('/admin-view-question')
-    return render(request,'quiz/admin_add_question.html',{'questionForm':questionForm})
+    return render(request,'quiz/admin_add_question.html',{'questionForm':questionForm, 'formset': formset})
 
 
 @login_required(login_url='adminlogin')

@@ -13,17 +13,16 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   a:link {
         text-decoration: none;
-        
-        }
+      }
     
   </style>
 </head>
-<h3 style="text-align:center">Are you sure this Teacher?!</h3>
-<form method="POST" autocomplete="off" style="margin:500px;margin-top: 0px;">
+<h3 style="text-align:center">Verification</h3>
+<form method="POST" autocomplete="off" style="margin:300px;margin-top: 0px;">
     {%csrf_token%}
     <div class="form-group">
-      <label for="salary">click below:</label>
-    
+      <label for="salary">ensure you are not a robot</label>
+      {% render_field teacherSalary.salary class="form-control" placeholder="enter 0 or higher" %}
     </div>
     
 

@@ -16,9 +16,13 @@ def studentclick_view(request):
         return HttpResponseRedirect('afterlogin')
     return render(request,'student/studentclick.html')
 
+
 def student_signup_view(request):
-    userForm=forms.StudentUserForm()
-    studentForm=forms.StudentForm()
+    #Wafi edit's  add request.POST inside froms
+    userForm=forms.StudentUserForm(request.POST or None)
+    studentForm=forms.StudentForm(request.POST or None)
+    # and edits
+    
     mydict={'userForm':userForm,'studentForm':studentForm}
     if request.method=='POST':
         userForm=forms.StudentUserForm(request.POST)
@@ -32,7 +36,9 @@ def student_signup_view(request):
             student.save()
             my_student_group = Group.objects.get_or_create(name='STUDENT')
             my_student_group[0].user_set.add(user)
-        return HttpResponseRedirect('studentlogin')
+
+            return redirect('studentlogin')
+        
     return render(request,'student/studentsignup.html',context=mydict)
 
 def is_student(user):
@@ -70,7 +76,7 @@ def take_exam_view(request,pk):
 @user_passes_test(is_student)
 def start_exam_view(request,pk):
     course=QMODEL.Course.objects.get(id=pk)
-    questions=QMODEL.Question.objects.all().filter(course=course)
+    questions=QMODEL.Question.objects.all().filter(course=course).order_by('?')
     if request.method=='POST':
         pass
     response= render(request,'student/start_exam.html',{'course':course,'questions':questions})
@@ -84,12 +90,11 @@ def calculate_marks_view(request):
     if request.COOKIES.get('course_id') is not None:
         course_id = request.COOKIES.get('course_id')
         course=QMODEL.Course.objects.get(id=course_id)
-        
         total_marks=0
         questions=QMODEL.Question.objects.all().filter(course=course)
-        for i in range(len(questions)):
-            
-            selected_ans = request.COOKIES.get(str(i+1))
+        for i, q in enumerate(questions):
+            #print('request', request.COOKIES.get(str(q.id)))
+            selected_ans = request.COOKIES.get(str(q.id))
             actual_answer = questions[i].answer
             if selected_ans == actual_answer:
                 total_marks = total_marks + questions[i].marks

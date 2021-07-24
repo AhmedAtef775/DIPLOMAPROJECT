@@ -17,18 +17,21 @@
     
   </style>
 </head>
-<h2 style="text-align:center; color:blue;">ADD COURSE</h2>
+<h2 style="text-align:center; color:blue;">ADD VERIFICATION TEST</h2>
 <form method="POST" autocomplete="off" style="margin:100px;margin-top: 0px;">
     {%csrf_token%}
     <div class="form-group">
-      <label for="course_name">Course Name</label>
-      {% render_field courseForm.course_name class="form-control" placeholder="Java" %}
+      <label for="course_name">Test Name</label>
+      {% render_field courseForm.course_name class="form-control" placeholder="Test Name" %}
 
-      <label for="question_number">Total Question</label>
+      <label for="question_number">Total Questions</label>
       {% render_field courseForm.question_number class="form-control" placeholder="10" %}
 
       <label for="total_marks">Total Marks</label>
       {% render_field courseForm.total_marks class="form-control" placeholder="50" %}
+
+      <label for="total_marks">Timer</label>
+      {% render_field courseForm.timer class="form-control" placeholder="Add minutes" %}
     </div>
     
 

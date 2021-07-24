@@ -1,12 +1,22 @@
+
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path,include
 from django.contrib import admin
 from quiz import views
 from django.contrib.auth.views import LogoutView,LoginView
+
+from django.views.static import serve
+from django.conf.urls import url
+
 urlpatterns = [
    
     path('admin/', admin.site.urls),
     path('teacher/',include('teacher.urls')),
     path('student/',include('student.urls')),
+
+    url(r'^media/(?P<path>.*)$', serve,{'document_root':       settings.MEDIA_ROOT}), 
+    url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}), 
     
 
 
